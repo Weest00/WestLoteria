@@ -1,0 +1,7 @@
+name: WestLoteria
+version: 1.0
+author: West
+description: Um plugin de loteria em gui
+main: br.com.west.loteria.Main
+commands:
+  loteria:

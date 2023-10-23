@@ -1,0 +1,3 @@
+last-winner: null #Não altere esse campo.
+price-reward: 32993243434343434 #Coloque o preço da recompensa desejada.
+loteria-time: 5 #Vezes que o evento será transmitido(OBS: serão enviados 5 anuncios a cada 1, totalizando 5 min)
