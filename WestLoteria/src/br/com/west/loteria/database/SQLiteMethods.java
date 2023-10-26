@@ -4,9 +4,8 @@ import br.com.west.loteria.Main;
 import br.com.west.loteria.objects.PlayerUtil;
 import org.bukkit.Bukkit;
 import java.sql.*;
-import java.util.Map;
-public class SQLiteMethods {
 
+public class SQLiteMethods {
 
     public void createTable() {
         try {
@@ -22,21 +21,16 @@ public class SQLiteMethods {
         }
     }
 
-    public boolean getPlayer(String player) {
+    public boolean getPlayer(PlayerUtil playerUtil) {
         try {
             PreparedStatement stm = connection().prepareStatement("SELECT * FROM `west_loteria` WHERE `player` = ?");
-            stm.setString(1, player);
+            stm.setString(1, playerUtil.getName());
             ResultSet rs = stm.executeQuery();
-            if (rs.next()) {
-                return true;
+            return rs.next();
 
-            } else {
-
-                return false;
-            }
 
         } catch (SQLException e) {
-            Bukkit.getConsoleSender().sendMessage("§a[SQLITE] §fErro ao buscar o jogador §a" + player + " §fna database.");
+            Bukkit.getConsoleSender().sendMessage("§a[SQLITE] §fErro ao buscar o jogador §a" + playerUtil.getName() + " §fna database.");
             return false;
 
         }
@@ -44,19 +38,13 @@ public class SQLiteMethods {
 
     public void loadPlayers() {
         int count = 0;
-
         try {
             PreparedStatement stm = connection().prepareStatement("SELECT * FROM `west_loteria`");
             ResultSet rs = stm.executeQuery();
 
             while (rs.next()) {
-                String player = rs.getString("player");
-                int winners = rs.getInt("winners");
-                double coins = rs.getDouble("coins");
-
-
-                PlayerUtil playerUtil = new PlayerUtil(player, winners, coins);
-                Main.getInstance().getCache().getCachePlayer().put(player, playerUtil);
+                PlayerUtil playerUtil = new PlayerUtil(rs.getString("player"), rs.getInt("winners"), rs.getDouble("coins"));
+                Main.getInstance().getCache().getCachePlayer().put(rs.getString("player"), playerUtil);
                 count++;
             }
 
@@ -70,59 +58,55 @@ public class SQLiteMethods {
         }
     }
 
-    public void insertPlayer(String player, int winners, double coins) {
+    public void insertPlayer(PlayerUtil playerUtil) {
         try {
             PreparedStatement stm = connection().prepareStatement("INSERT INTO `west_loteria` (`player`,`winners`,`coins`) VAlUES (?,?,?)");
-            stm.setString(1, player);
-            stm.setInt(2, winners);
-            stm.setDouble(3, coins);
+            stm.setString(1, playerUtil.getName());
+            stm.setInt(2, playerUtil.getWinners());
+            stm.setDouble(3, playerUtil.getCoins());
             stm.executeUpdate();
         } catch (SQLException e) {
-            Bukkit.getConsoleSender().sendMessage("§a[SQLITE] §fErro ao inserir o jogador §a" + player + " §fna database.");
+            Bukkit.getConsoleSender().sendMessage("§a[SQLITE] §fErro ao inserir o jogador §a" + playerUtil.getName() + " §fna database.");
 
         }
 
     }
 
-    public void updatePlayer(String player, int winners, double coins) {
+    public void updatePlayer(PlayerUtil playerUtil) {
         try {
             PreparedStatement stm = connection().prepareStatement("UPDATE `west_loteria` SET `winners` =? ,`coins` =? WHERE `player` =?");
-            stm.setInt(1, winners);
-            stm.setDouble(2, coins);
-            stm.setString(3, player);
+            stm.setInt(1, playerUtil.getWinners());
+            stm.setDouble(2, playerUtil.getCoins());
+            stm.setString(3, playerUtil.getName());
             stm.executeUpdate();
         } catch (SQLException e) {
-            Bukkit.getConsoleSender().sendMessage("§a[SQLITE] §fErro ao atualizar o jogador §a" + player + " §fna database.");
+            Bukkit.getConsoleSender().sendMessage("§a[SQLITE] §fErro ao atualizar o jogador §a" + playerUtil.getName() + " §fna database.");
         }
 
     }
 
     public void savePlayers() {
         int count = 0;
-        for (Map.Entry<String, PlayerUtil> player :  Main.getInstance().getCache().getCachePlayer().entrySet()) {
-            if (getPlayer(player.getKey())) {
-                updatePlayer(player.getKey(), player.getValue().getWinners(), player.getValue().getCoins());
+        for (PlayerUtil players : Main.getInstance().getCache().getCachePlayer().values()) {
+            if (getPlayer(players)) {
+                updatePlayer(players);
                 count++;
-
 
             } else {
-                insertPlayer(player.getKey(), player.getValue().getWinners(), player.getValue().getCoins());
+                insertPlayer(players);
                 count++;
-
             }
 
         }
         Main.getInstance().getSQLite().disconnect();
         Bukkit.getConsoleSender().sendMessage("§a[SQLITE] §fForam salvos §a" + count + "§f jogadores na database.");
-        }
+    }
 
 
     public void updateTopWinners() {
         if (!Main.getInstance().getCache().getTopWinners().isEmpty()) {
             Main.getInstance().getCache().getTopWinners().clear();
-
         }
-
         try {
             PreparedStatement stm = connection().prepareStatement("SELECT * FROM `west_loteria` ORDER BY `winners` DESC LIMIT 10");
             ResultSet rs = stm.executeQuery();
@@ -136,24 +120,21 @@ public class SQLiteMethods {
             Main.getInstance().getSQLite().disconnect();
             Bukkit.getConsoleSender().sendMessage("§a[SQLITE] §fErro ao buscar o top vitórias.");
             return;
-
         }
-
         Main.getInstance().getSQLite().disconnect();
         Bukkit.getConsoleSender().sendMessage("§a[SQLITE] §fTop vitórias atualizado com sucesso.");
 
     }
 
-    public void updateTopCoins(){
-        if(!Main.getInstance().getCache().getTopCoins().isEmpty()) {
+    public void updateTopCoins() {
+        if (!Main.getInstance().getCache().getTopCoins().isEmpty()) {
             Main.getInstance().getCache().getTopCoins().clear();
-
         }
         try {
             PreparedStatement stm = connection().prepareStatement("SELECT * FROM `west_loteria` ORDER BY `coins` DESC LIMIT 10");
             ResultSet rs = stm.executeQuery();
 
-            while (rs.next()){
+            while (rs.next()) {
                 String playerName = rs.getString("player");
                 Main.getInstance().getCache().getTopCoins().add(playerName);
             }
@@ -164,10 +145,8 @@ public class SQLiteMethods {
             return;
 
         }
-
         Main.getInstance().getSQLite().disconnect();
         Bukkit.getConsoleSender().sendMessage("§a[SQLITE] §fTop coins atualizado com sucesso.");
-
     }
 
     private Connection connection() {

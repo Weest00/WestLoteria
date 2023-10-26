@@ -2,38 +2,36 @@ package br.com.west.loteria.managers;
 
 
 import br.com.west.loteria.objects.PlayerUtil;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Cache {
 
     private HashMap<String, PlayerUtil> cachePlayer = new HashMap<>();
 
-    private ArrayList<String> topWinners = new ArrayList<>();
+    private Set<String> topWinners = new HashSet<>();
 
-    private ArrayList<String> topLastWinners = new ArrayList<>();
 
-    private ArrayList<String> topCoins = new ArrayList<>();
+    private Set<String> topCoins = new HashSet<>();
 
-    private ArrayList<String> chatLock = new ArrayList<>();
+    private Set<String> chatLock = new HashSet<>();
 
     public HashMap<String, PlayerUtil> getCachePlayer() {
         return cachePlayer;
     }
 
-    public ArrayList<String> getTopWinners() {
+    public Set<String> getTopWinners() {
         return topWinners;
     }
 
-    public ArrayList<String> getTopLastWinners() {
-        return topLastWinners;
-    }
 
-    public ArrayList<String> getTopCoins() {
+    public Set<String> getTopCoins() {
         return topCoins;
     }
 
-    public ArrayList<String> getChatLock() {
+    public Set<String> getChatLock() {
         return chatLock;
     }
 }
+

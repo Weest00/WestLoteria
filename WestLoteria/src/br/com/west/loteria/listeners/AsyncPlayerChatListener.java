@@ -3,15 +3,11 @@ package br.com.west.loteria.listeners;
 import br.com.west.loteria.Main;
 import br.com.west.loteria.apis.NumberFormat;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.FireworkEffect;
 import org.bukkit.Sound;
-import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.inventory.meta.FireworkMeta;
 
 public class AsyncPlayerChatListener implements Listener {
 
